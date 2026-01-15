@@ -7,7 +7,7 @@ export default function PostList() {
     const [currentPage, setCurrentPage] = useState(1);
 
     const navigate = useNavigate()
-    
+
     const POSTS_PER_PAGE = 10;
 
     useEffect(() => {
@@ -35,7 +35,10 @@ export default function PostList() {
             {/* Header */}
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-xl font-semibold">Post List</h1>
-                <button className="px-4 py-2 rounded-md bg-gray-900 text-white">
+                <button
+                    onClick={() => navigate('/create-post')}
+                    className="px-4 py-2 rounded-md bg-gray-900 text-white"
+                >
                     + Create a new post
                 </button>
             </div>
@@ -75,8 +78,8 @@ export default function PostList() {
                         key={index}
                         onClick={() => setCurrentPage(index + 1)}
                         className={`w-9 h-9 rounded-full ${currentPage === index + 1
-                                ? "bg-blue-600 text-white"
-                                : "bg-gray-200"
+                            ? "bg-blue-600 text-white"
+                            : "bg-gray-200"
                             }`}
                     >
                         {index + 1}

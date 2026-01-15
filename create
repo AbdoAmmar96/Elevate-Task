@@ -1,0 +1,162 @@
+import React, { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { postSchema } from '../lib/validations';
+import { createPost, fetchUsers } from '../lib/api';
+import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
+import { Input } from '../components/ui/input';
+import { Textarea } from '../components/ui/textarea';
+import { Select } from '../components/ui/select';
+import { Button } from '../components/ui/button';
+import { Edit3, AlertCircle } from 'lucide-react';
+import { toast } from 'sonner';
+
+export default function CreatePost() {
+    const [users, setUsers] = useState([]);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [serverError, setServerError] = useState(null);
+
+    const {
+        register,
+        handleSubmit,
+        reset,
+        formState: { errors },
+    } = useForm({
+        resolver: zodResolver(postSchema),
+        defaultValues: {
+            title: '',
+            body: '',
+            userId: '',
+        },
+    });
+
+    useEffect(() => {
+        const loadUsers = async () => {
+            try {
+                const usersData = await fetchUsers();
+                setUsers(usersData);
+            } catch (error) {
+                console.error('Failed to load users:', error);
+            }
+        };
+        loadUsers();
+    }, []);
+
+    const onSubmit = async (data) => {
+        setIsSubmitting(true);
+        setServerError(null);
+
+        try {
+            await createPost(data);
+
+            // Show success toast
+            toast.success('A new post has been successfully created!', {
+                duration: 3000,
+                className: 'bg-[#2D3748] text-white',
+            });
+
+            // Reset form
+            reset();
+        } catch (error) {
+            console.error('Failed to create post:', error);
+            setServerError('Internal Server Error');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    return (
+        <Card className="w-full max-w-2xl mx-auto">
+            <CardHeader className="bg-[#C5D0DC] rounded-t-xl border-b-0">
+                <Edit3 className="w-5 h-5 text-[#2D3748]" />
+                <CardTitle className="text-[#2D3748]">Create a New Post</CardTitle>
+            </CardHeader>
+
+            <CardContent className="bg-[#C5D0DC] rounded-b-xl">
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+                    {/* Title Field */}
+                    <div>
+                        <label htmlFor="title" className="block text-sm font-medium text-[#2D3748] mb-2">
+                            Title
+                        </label>
+                        <Input
+                            id="title"
+                            placeholder="Enter post title"
+                            error={errors.title}
+                            {...register('title')}
+                        />
+                        {errors.title && (
+                            <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                                <AlertCircle className="w-4 h-4" />
+                                {errors.title.message}
+                            </p>
+                        )}
+                    </div>
+
+                    {/* Body Field */}
+                    <div>
+                        <label htmlFor="body" className="block text-sm font-medium text-[#2D3748] mb-2">
+                            Body
+                        </label>
+                        <Textarea
+                            id="body"
+                            placeholder="Enter post body"
+                            error={errors.body}
+                            {...register('body')}
+                        />
+                        {errors.body && (
+                            <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                                <AlertCircle className="w-4 h-4" />
+                                {errors.body.message}
+                            </p>
+                        )}
+                    </div>
+
+                    {/* Author Field */}
+                    <div>
+                        <label htmlFor="userId" className="block text-sm font-medium text-[#2D3748] mb-2">
+                            Author
+                        </label>
+                        <Select
+                            id="userId"
+                            error={errors.userId}
+                            {...register('userId')}
+                        >
+                            <option value="">Select Author</option>
+                            {users.map((user) => (
+                                <option key={user.id} value={user.id}>
+                                    {user.name}
+                                </option>
+                            ))}
+                        </Select>
+                        {errors.userId && (
+                            <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                                <AlertCircle className="w-4 h-4" />
+                                {errors.userId.message}
+                            </p>
+                        )}
+                    </div>
+
+                    {/* Server Error Banner */}
+                    {serverError && (
+                        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md flex items-center gap-2">
+                            <AlertCircle className="w-5 h-5" />
+                            <span>{serverError}</span>
+                        </div>
+                    )}
+
+                    {/* Submit Button */}
+                    <div className="pt-2">
+                        <Button
+                            type="submit"
+                            disabled={isSubmitting}
+                            className="w-full"
+                        >
+                            {isSubmitting ? 'Creating...' : 'Create Post'}
+                        </Button>
+                    </div>
+                </form>
+            </CardContent>
+        </Card>
+    );
+}

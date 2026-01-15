@@ -1,0 +1,84 @@
+    <div>
+    <main>
+    <section className="create-post-card-body">
+      <form onSubmit={handleSubmit(onSubmit)} className="form-grid">
+        {/* Title */}
+        <div className="form-row">
+          <label htmlFor="title" className="form-label">Title</label>
+          <input
+            id="title"
+            type="text"
+            placeholder="Enter post title"
+            className={`finput ${errors.title ? 'finput-error' : ''}`}
+            {...register('title')}
+          />
+          {errors.title && (
+            <p className="field-error">
+              <AlertCircle className="err-icon" />
+              {errors.title.message}
+            </p>
+          )}
+        </div>
+
+        {/* Body */}
+        <div className="form-row">
+          <label htmlFor="body" className="form-label">Body</label>
+          <textarea
+            id="body"
+            placeholder="Enter post body"
+            className={`ftextarea ${errors.body ? 'finput-error' : ''}`}
+            {...register('body')}
+          />
+          {errors.body && (
+            <p className="field-error">
+              <AlertCircle className="err-icon" />
+              {errors.body.message}
+            </p>
+          )}
+        </div>
+
+        {/* Author */}
+        <div className="form-row">
+          <label htmlFor="userId" className="form-label">Author</label>
+          <select
+            id="userId"
+            className={`fselect ${errors.userId ? 'finput-error' : ''}`}
+            defaultValue=""
+            {...register('userId')}
+          >
+            <option value="" disabled>Select Author</option>
+            {users.map((user) => (
+              <option key={user.id} value={user.id}>
+                {user.name}
+              </option>
+            ))}
+          </select>
+          {errors.userId && (
+            <p className="field-error">
+              <AlertCircle className="err-icon" />
+              {errors.userId.message}
+            </p>
+          )}
+        </div>
+
+        {/* server error */}
+        {serverError && (
+          <div className="server-error">
+            <AlertCircle className="err-icon" />
+            <span>{serverError}</span>
+          </div>
+        )}
+
+        <div className="form-row submit-row">
+          <button
+            type="submit"
+            className="submit-btn"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Creating...' : 'Create Post'}
+          </button>
+        </div>
+      </form>
+    </section>
+  </main>
+</div>
