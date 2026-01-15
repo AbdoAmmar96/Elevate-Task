@@ -1,5 +1,5 @@
-Elevate Frontend Advanced Bootcamp Project 🚀
-Project Overview
+#Elevate Frontend Advanced Bootcamp Project 🚀
+#Project Overview
 This is a post-style application built as part of the Elevate Frontend Advanced Bootcamp. The project focuses on building a pixel-perfect UI and integrating with the JSONPlaceholder API to manage and display posts. It demonstrates clean code practices, scalable architecture, and robust form handling.
 
 
