@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { postSchema } from '../lib/validations';
@@ -8,6 +9,7 @@ import { AlertCircle } from 'lucide-react';
 import './CreatePost.css';
 
 export default function CreatePost() {
+    const navigate = useNavigate();
     const [users, setUsers] = useState([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [serverError, setServerError] = useState(null);
@@ -57,6 +59,11 @@ export default function CreatePost() {
 
             // Reset form
             reset();
+
+            // Redirect to home after 2 seconds
+            setTimeout(() => {
+                navigate('/');
+            }, 2000);
         } catch (error) {
             console.error('Failed to create post:', error);
             setServerError('Internal Server Error');

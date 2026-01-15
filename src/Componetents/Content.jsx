@@ -1,19 +1,36 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom'
+import { fetchPosts } from '../lib/api';
+import { toast } from 'sonner';
 
+//last one
 export default function PostList() {
     const [posts, setPosts] = useState([]);
     const [search, setSearch] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
+
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     const navigate = useNavigate()
 
     const POSTS_PER_PAGE = 10;
 
     useEffect(() => {
-        fetch("https://jsonplaceholder.typicode.com/posts")
-            .then((res) => res.json())
-            .then((data) => setPosts(data));
+        const loadPosts = async () => {
+            try {
+                setLoading(true);
+                const data = await fetchPosts();
+                setPosts(data);
+            } catch (err) {
+                setError('Failed to load posts. Please try again later.');
+                toast.error('Failed to load posts');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadPosts();
     }, []);
 
     // Search filter
@@ -29,6 +46,24 @@ export default function PostList() {
     );
 
     const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
+
+    if (loading) {
+        return (
+            <div className="max-w-6xl mx-auto p-6 flex justify-center items-center h-64">
+                <div className="text-xl font-semibold text-white">Loading posts...</div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="max-w-6xl mx-auto p-6 flex justify-center items-center h-64">
+                <div className="text-xl font-semibold text-red-100 bg-red-500/50 px-6 py-4 rounded-lg">
+                    {error}
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="max-w-6xl mx-auto p-6  bg-[#8496a7] rounded-2xl">
